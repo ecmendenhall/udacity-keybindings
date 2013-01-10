@@ -37,7 +37,8 @@ function load_bindings () {
     new_css.innerHTML = cursor_style;
     document.head.appendChild(new_css);
 
-    var ember_view_div = document.getElementById('ember2849');
+    var ember_view_div = document.getElementById('assignment-view').firstElementChild;
+    var ember_view_id = ember_view_div.id;
     var textarea = ember_view_div.childNodes[1];
     var codemirror = ember_view_div.childNodes[2];
     var buttonbar = ember_view_div.childNodes[4];
@@ -50,7 +51,7 @@ function load_bindings () {
     ember_view_div.appendChild(textarea);
     ember_view_div.appendChild(buttonbar);
 
-    Ember.View.views.ember2849.assignment.reopen({ reloadIDE: function () {
+    Ember.View.views[ember_view_id].assignment.reopen({ reloadIDE: function () {
         _this=this
         this.addObserver('ideModel', function () {
             var customIDE = _this.get('ideModel');
@@ -119,9 +120,9 @@ function load_bindings () {
         }
     }});
 
-    Ember.View.views.ember2849.assignment.reloadIDE();
+    Ember.View.views[ember_view_id].assignment.reloadIDE();
 
-    var old_ide = document.getElementById('ember2849').childNodes[5];
+    var old_ide = document.getElementById(ember_view_id).childNodes[5];
     ember_view_div.removeChild(old_ide);
 }
 
@@ -153,27 +154,40 @@ function load_keymap_btn () {
 
     keymap_btn.setAttribute("state", 0);
 
-    keymap_btn.addEventListener('click', function () {
+    function toggle_mode (btn) {
         var binding_titles = ["DEFAULT", "VIM"];
-        var btn_state = this.getAttribute('state');
+        var btn_state = btn.getAttribute('state');
         var i = parseInt(btn_state);
         i = (i + 1) % binding_titles.length;
-        this.setAttribute("state", i);
+        btn.setAttribute("state", i);
         var keymap_mode = binding_titles[i];
-        this.firstElementChild.innerText = keymap_mode;
+        btn.firstElementChild.innerText = keymap_mode;
+        return keymap_mode;
+    }
 
+    function reset_mode (btn) {
+        btn.setAttribute("state", 0);
+        btn.firstElementChild.innerText = "DEFAULT";
+    }
+
+    keymap_btn.addEventListener('click', function () {
+        var keymap_mode = toggle_mode(this);
         if (keymap_mode === "VIM") {
             inject(load_bindings);
         }
     });
 
+    window.addEventListener('hashchange', function () {
+        reset_mode(keymap_btn); 
+    });
+
     function try_append () {
         console.log("try_append");
-        var auto_next_view = document.getElementById('ember2894');
+        var auto_next_view = right_column.childNodes[2];
         if (auto_next_view) {
           right_column.appendChild(keymap_btn); 
         } else {
-            setTimeout(try_append, 300);
+            setTimeout(try_append, 500);
         }
     }
 
