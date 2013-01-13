@@ -18,11 +18,15 @@ function inject(fn) {
     document.body.removeChild(script);
 }
 
-function load_bindings () { 
-    var vimbindings = document.createElement('script');
-    vimbindings.type = 'text/javascript';
-    vimbindings.src = 'http://codemirror.net/keymap/vim.js';
-    document.head.appendChild(vimbindings);
+function load_bindings () {
+    var vimbindings, new_css;
+
+    if (!vimbindings) { 
+        vimbindings = document.createElement('script');
+        vimbindings.type = 'text/javascript';
+        vimbindings.src = 'http://codemirror.net/keymap/vim.js';
+        document.head.appendChild(vimbindings);
+    }
 
     var cursor_style = ['.CodeMirror.cm-keymap-fat-cursor pre.CodeMirror-cursor {',
                        '    z-index: 10;',
@@ -32,44 +36,24 @@ function load_bindings () {
                        '    background: rgba(0, 200, 0, .4);',
                        '}'].join('\n');
 
-    var new_css = document.createElement('style');
-    new_css.type = 'text/css';
-    new_css.innerHTML = cursor_style;
-    document.head.appendChild(new_css);
+    
+    if (!new_css) {
+        new_css = document.createElement('style');
+        new_css.type = 'text/css';
+        new_css.innerHTML = cursor_style;
+        document.head.appendChild(new_css);
+    }
 
-    var ember_view_div = document.getElementById('assignment-view').firstElementChild;
-    var ember_view_id = ember_view_div.id;
-    var textarea = ember_view_div.childNodes[1];
-    var codemirror = ember_view_div.childNodes[2];
-    var buttonbar = ember_view_div.childNodes[4];
-    console.log(buttonbar);
+    var keymap_mode = document.getElementById('keymap_btn').firstElementChild.innerText;
 
-    ember_view_div.removeChild(textarea);
-    ember_view_div.removeChild(codemirror);
-    ember_view_div.removeChild(buttonbar);
+    var ide_params = {mode: 'python', 
+                      theme: 'eclipse', 
+                      indentUnit: 4, 
+                      lineNumbers: true };
 
-    ember_view_div.appendChild(textarea);
-    ember_view_div.appendChild(buttonbar);
-
-    Ember.View.views[ember_view_id].assignment.reopen({ reloadIDE: function () {
-        _this=this
-        this.addObserver('ideModel', function () {
-            var customIDE = _this.get('ideModel');
-            if (!customIDE) {
-                return;
-            }
-            var startingCode = customIDE.get('usercode') || customIDE.get('suppliedCode') || "Welcome to Udacious IDE!";
-            var codeEditor;
-            var aceDiv = _this.get('aceDiv');
-            CodeMirror.keyMap.basic.Tab = "indentMore";
-            var editor_textarea = document.getElementById('editor');
-            codeEditor = CodeMirror.fromTextArea(editor_textarea,
-            {mode: 'python', 
-             theme: 'eclipse', 
-             indentUnit: 4, 
-             lineNumbers: true, 
-             keyMap: 'vim',
-             onKeyEvent: function (instance, key_event) {
+    ide_params.keyMap = keymap_mode.toLowerCase();
+    if (keymap_mode === 'VIM') {
+        ide_params.onKeyEvent = function (instance, key_event) {
 
                  function changeCursor(state) {
                      var cm_div = document.getElementsByClassName('CodeMirror')[0];
@@ -109,25 +93,59 @@ function load_bindings () {
                  else if (key_event.keyIdentifier === 'U+004F') {
                      changeCursor('insert');
                  }
-             }
-                });
-            codeEditor.setValue(startingCode);
-            _this.set('codeEditor', codeEditor);});
-        var model = this.get('ideModel');
-        if (model && this.get('codeEditor')) {
-            this.set('ideModel', false);
-            this.set('ideModel', model);
         }
-    }});
+    }
+
+    var ember_view_div = document.getElementById('assignment-view').firstElementChild;
+    var ember_view_id = ember_view_div.id;
+    var ember_view_children = ember_view_div.childNodes;
+    console.log(ember_view_children);
+    var textarea = ember_view_children[1];
+    var codemirror = ember_view_children[2];
+    var buttonbar = ember_view_children[4];
+
+    ember_view_div.removeChild(textarea);
+    ember_view_div.removeChild(codemirror);
+    ember_view_div.removeChild(buttonbar);
+
+    ember_view_div.appendChild(textarea);
+    ember_view_div.appendChild(buttonbar);
+
+    var reloadIDE_inserted = Ember.View.views[ember_view_id].assignment.reloadIDE;
+    
+    if (!reloadIDE_inserted) {
+        Ember.View.views[ember_view_id].assignment.reopen({ reloadIDE: function () {
+            _this=this
+            this.addObserver('ideModel', function () {
+                var customIDE = _this.get('ideModel');
+                if (!customIDE) {
+                    return;
+                }
+                var startingCode = customIDE.get('usercode') || customIDE.get('suppliedCode') || "Welcome to Udacious IDE!";
+                var codeEditor;
+                var aceDiv = _this.get('aceDiv');
+                CodeMirror.keyMap.basic.Tab = "indentMore";
+                var editor_textarea = document.getElementById('editor');
+                codeEditor = CodeMirror.fromTextArea(editor_textarea,
+                ide_params);
+                codeEditor.setValue(startingCode);
+                _this.set('codeEditor', codeEditor);});
+            var model = this.get('ideModel');
+            if (model && this.get('codeEditor')) {
+                this.set('ideModel', false);
+                this.set('ideModel', model);
+            }
+        }});
+    }
 
     Ember.View.views[ember_view_id].assignment.reloadIDE();
 
-    var old_ide = document.getElementById(ember_view_id).childNodes[5];
-    ember_view_div.removeChild(old_ide);
+    var ide_nodes = ember_view_div.children;
+
+   // Remove duplicate "CodeMirror" divs! 
 }
 
 function load_keymap_btn () {
-    console.log("load_keymap_btn");
     var right_column = document.getElementById('player-right-column');
 
     var keymap_btn = document.createElement('div');
@@ -172,9 +190,7 @@ function load_keymap_btn () {
 
     keymap_btn.addEventListener('click', function () {
         var keymap_mode = toggle_mode(this);
-        if (keymap_mode === "VIM") {
-            inject(load_bindings);
-        }
+        inject(load_bindings);
     });
 
     window.addEventListener('hashchange', function () {
@@ -182,7 +198,6 @@ function load_keymap_btn () {
     });
 
     function try_append () {
-        console.log("try_append");
         var auto_next_view = right_column.childNodes[2];
         if (auto_next_view) {
           right_column.appendChild(keymap_btn); 
