@@ -98,16 +98,16 @@ function load_bindings () {
 
     var ember_view_div = document.getElementById('assignment-view').firstElementChild;
     var ember_view_id = ember_view_div.id;
-    var ember_view_children = ember_view_div.childNodes;
-    console.log(ember_view_children);
-    var textarea = ember_view_children[1];
-    var codemirror = ember_view_children[2];
-    var buttonbar = ember_view_children[4];
+    var textarea = document.getElementById('editor');
+    var codemirror = ember_view_div.getElementsByClassName('CodeMirror')[0];
+    var buttonbar = document.getElementById('button_bar');
 
     ember_view_div.removeChild(textarea);
     ember_view_div.removeChild(codemirror);
     ember_view_div.removeChild(buttonbar);
 
+    var new_textarea = document.createElement('textarea');
+    new_textarea.setAttribute('id', 'editor');
     ember_view_div.appendChild(textarea);
     ember_view_div.appendChild(buttonbar);
 
@@ -116,33 +116,37 @@ function load_bindings () {
     if (!reloadIDE_inserted) {
         Ember.View.views[ember_view_id].assignment.reopen({ reloadIDE: function () {
             _this=this
-            this.addObserver('ideModel', function () {
+            function reload () {
                 var customIDE = _this.get('ideModel');
                 if (!customIDE) {
                     return;
                 }
                 var startingCode = customIDE.get('usercode') || customIDE.get('suppliedCode') || "Welcome to Udacious IDE!";
                 var codeEditor;
-                var aceDiv = _this.get('aceDiv');
                 CodeMirror.keyMap.basic.Tab = "indentMore";
                 var editor_textarea = document.getElementById('editor');
-                codeEditor = CodeMirror.fromTextArea(editor_textarea,
-                ide_params);
+                codeEditor = CodeMirror.fromTextArea(editor_textarea, ide_params);
                 codeEditor.setValue(startingCode);
-                _this.set('codeEditor', codeEditor);});
+                _this.set('codeEditor', codeEditor);
+            }
+            this.addObserver('ideModel', reload);                
             var model = this.get('ideModel');
             if (model && this.get('codeEditor')) {
                 this.set('ideModel', false);
                 this.set('ideModel', model);
             }
-        }});
+        } });
     }
 
     Ember.View.views[ember_view_id].assignment.reloadIDE();
+    
+    var old_ides_nl = ember_view_div.getElementsByClassName("CodeMirror");
+    var old_ides_arr = Array.prototype.slice.call(old_ides_nl).slice(1);
 
-    var ide_nodes = ember_view_div.children;
+    for (var i=0, len=old_ides_arr.length; i<len; i++) {
+        ember_view_div.removeChild(old_ides_arr[i]);
+    }
 
-   // Remove duplicate "CodeMirror" divs! 
 }
 
 function load_keymap_btn () {
