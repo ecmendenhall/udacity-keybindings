@@ -18,45 +18,22 @@ function inject(fn) {
     document.body.removeChild(script);
 }
 
-function load_bindings () {
-    var vimbindings, new_css;
-
-    if (!vimbindings) { 
-        vimbindings = document.createElement('script');
-        vimbindings.type = 'text/javascript';
-        vimbindings.src = 'http://codemirror.net/keymap/vim.js';
-        document.head.appendChild(vimbindings);
-    }
-
-    var cursor_style = ['.CodeMirror.cm-keymap-fat-cursor pre.CodeMirror-cursor {',
-                       '    z-index: 10;',
-                       '    width: auto;',
-                       '    border: 0;',
-                       '    background: transparent;',
-                       '    background: rgba(0, 200, 0, .4);',
-                       '}'].join('\n');
-
+function change_keymap () {
+    console.log('toggle_mode');
     
-    if (!new_css) {
-        new_css = document.createElement('style');
-        new_css.type = 'text/css';
-        new_css.innerHTML = cursor_style;
-        document.head.appendChild(new_css);
-    }
-
     var keymap_mode = document.getElementById('keymap_btn').firstElementChild.innerText;
 
-    var ide_params = {mode: 'python', 
-                      theme: 'eclipse', 
-                      indentUnit: 4, 
-                      lineNumbers: true };
-
-    ide_params.keyMap = keymap_mode.toLowerCase();
     if (keymap_mode === 'VIM') {
-        ide_params.onKeyEvent = function (instance, key_event) {
+        console.log(CodeMirror.keyMap.default);
+        console.log(CodeMirror.keyMap);
+        
+        CodeMirror.keyMap.default = CodeMirror.keyMap.vim;
+        /*codemirror_textarea.addEventListener('keydown', function (key_event) {
+                console.log(key_event);
+                var cm_div = document.getElementsByClassName('CodeMirror')[0]; 
 
-                 function changeCursor(state) {
-                     var cm_div = document.getElementsByClassName('CodeMirror')[0];
+                function changeCursor(state) {
+                     
                      var current_class = cm_div.className;
                      var focus = current_class.search('CodeMirror-focused');
                      var new_class;
@@ -93,60 +70,47 @@ function load_bindings () {
                  else if (key_event.keyIdentifier === 'U+004F') {
                      changeCursor('insert');
                  }
-        }
+        });*/
     }
-
-    var ember_view_div = document.getElementById('assignment-view').firstElementChild;
-    var ember_view_id = ember_view_div.id;
-    var textarea = document.getElementById('editor');
-    var codemirror = ember_view_div.getElementsByClassName('CodeMirror')[0];
-    var buttonbar = document.getElementById('button_bar');
-
-    ember_view_div.removeChild(textarea);
-    ember_view_div.removeChild(codemirror);
-    ember_view_div.removeChild(buttonbar);
-
-    var new_textarea = document.createElement('textarea');
-    new_textarea.setAttribute('id', 'editor');
-    ember_view_div.appendChild(textarea);
-    ember_view_div.appendChild(buttonbar);
-
-    var reloadIDE_inserted = Ember.View.views[ember_view_id].assignment.reloadIDE;
     
-    if (!reloadIDE_inserted) {
-        Ember.View.views[ember_view_id].assignment.reopen({ reloadIDE: function () {
-            _this=this
-            function reload () {
-                var customIDE = _this.get('ideModel');
-                if (!customIDE) {
-                    return;
-                }
-                var startingCode = customIDE.get('usercode') || customIDE.get('suppliedCode') || "Welcome to Udacious IDE!";
-                var codeEditor;
-                CodeMirror.keyMap.basic.Tab = "indentMore";
-                var editor_textarea = document.getElementById('editor');
-                codeEditor = CodeMirror.fromTextArea(editor_textarea, ide_params);
-                codeEditor.setValue(startingCode);
-                _this.set('codeEditor', codeEditor);
-            }
-            this.addObserver('ideModel', reload);                
-            var model = this.get('ideModel');
-            if (model && this.get('codeEditor')) {
-                this.set('ideModel', false);
-                this.set('ideModel', model);
-            }
-        } });
+    else if (keymap_mode === 'DEFAULT') {
+        CodeMirror.keyMap.default = CodeMirror.keyMap._default;
+        //cm_div.addEventListener('keydown', function () {});
     }
 
-    Ember.View.views[ember_view_id].assignment.reloadIDE();
-    
-    var old_ides_nl = ember_view_div.getElementsByClassName("CodeMirror");
-    var old_ides_arr = Array.prototype.slice.call(old_ides_nl).slice(1);
-
-    for (var i=0, len=old_ides_arr.length; i<len; i++) {
-        ember_view_div.removeChild(old_ides_arr[i]);
+    else if (keymap_mode === 'EMACS') {
+        CodeMirror.keyMap.default = CodeMirror.keyMap.emacs;
     }
+}
 
+function load_bindings () {
+        console.log('load_bindings');
+
+        vimbindings = document.createElement('script');
+        vimbindings.type = 'text/javascript';
+        vimbindings.src = 'https://raw.github.com/marijnh/CodeMirror/master/keymap/vim.js';
+        vimbindings.id = 'vimbindings';
+        document.head.appendChild(vimbindings);
+
+        emacsbindings = document.createElement('script');
+        emacsbindings.type = 'text/javascript';
+        emacsbindings.src = 'https://raw.github.com/marijnh/CodeMirror/master/keymap/emacs.js';
+        document.head.appendChild(emacsbindings);
+
+        var cursor_style = ['.CodeMirror.cm-keymap-fat-cursor pre.CodeMirror-cursor {',
+                           '    z-index: 10;',
+                           '    width: auto;',
+                           '    border: 0;',
+                           '    background: transparent;',
+                           '    background: rgba(0, 200, 0, .4);',
+                           '}'].join('\n');
+        
+        var new_css = document.createElement('style');
+        new_css.type = 'text/css';
+        new_css.innerHTML = cursor_style;
+        document.head.appendChild(new_css);
+
+        CodeMirror.keyMap._default = CodeMirror.keyMap.default;
 }
 
 function load_keymap_btn () {
@@ -177,7 +141,7 @@ function load_keymap_btn () {
     keymap_btn.setAttribute("state", 0);
 
     function toggle_mode (btn) {
-        var binding_titles = ["DEFAULT", "VIM"];
+        var binding_titles = ["DEFAULT", "VIM", "EMACS"];
         var btn_state = btn.getAttribute('state');
         var i = parseInt(btn_state);
         i = (i + 1) % binding_titles.length;
@@ -193,13 +157,16 @@ function load_keymap_btn () {
     }
 
     keymap_btn.addEventListener('click', function () {
+        console.log('click')
         var keymap_mode = toggle_mode(this);
-        inject(load_bindings);
+        inject(change_keymap);
     });
 
     window.addEventListener('hashchange', function () {
         reset_mode(keymap_btn); 
     });
+
+    inject(load_bindings);
 
     function try_append () {
         var auto_next_view = right_column.childNodes[2];
