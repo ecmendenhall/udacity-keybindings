@@ -4,6 +4,8 @@
 // @version 0.9
 // 
 // @namespace http://e.cmendenhall.com/
+//
+// @downloadURL https://github.com/ecmendenhall/udacity-keybindings/raw/master/udacity-extended-keybindings.user.js
 // 
 // @include http://www.udacity.com/view*
 // @match http://www.udacity.com/view*
@@ -34,6 +36,12 @@ function change_keymap () {
     if (keymap_mode === 'VIM') {
         
         code_editor.setOption('keyMap', 'vim');
+        code_editor.setOption('extraKeys', {"':'": function (cm) {
+            var state = cm.getOption('keyMap')
+            if (state === 'vim-insert') {
+               cm.replaceSelection(':', "end");
+            }
+        }});
         code_editor.setOption('onKeyEvent', function (instance, key_event) {
                 
                 function changeCursor(state) {
@@ -91,32 +99,35 @@ function change_keymap () {
     
     else if (keymap_mode === 'DEFAULT') {
         code_editor.setOption('keyMap', 'default');
+        code_editor.setOption('extraKeys', null);
         
     }
 
     else if (keymap_mode === 'EMACS') {
         code_editor.setOption('keyMap', 'emacs');
+        code_editor.setOption('extraKeys', null);
         code_editor.setOption('onKeyEvent', function () {});
     }
 }
 
 function load_bindings () {
+        
+        function insert_script(name, url) {
+            var newscript = document.createElement('script');
+            newscript.type = 'text/javascript';
+            newscript.src = url;
+            newscript.id = name;
+            document.head.appendChild(newscript);
+        }
 
-        codemirror_js = document.createElement('script');
-        codemirror_js.type = 'text/javascript';
-        codemirror_js.type.src = 'https://raw.github.com/marijnh/CodeMirror/master/lib/codemirror.js';
-        document.head.appendChild(codemirror_js);
+        var scripts = [{name: 'vimbindings',
+                        src:'https://raw.github.com/marijnh/CodeMirror/master/keymap/vim.js'},
+                       {name: 'emacsbindings',
+                        src: 'https://raw.github.com/marijnh/CodeMirror/master/keymap/emacs.js'}];
 
-        vimbindings = document.createElement('script');
-        vimbindings.type = 'text/javascript';
-        vimbindings.src = 'https://raw.github.com/marijnh/CodeMirror/master/keymap/vim.js';
-        vimbindings.id = 'vimbindings';
-        document.head.appendChild(vimbindings);
-
-        emacsbindings = document.createElement('script');
-        emacsbindings.type = 'text/javascript';
-        emacsbindings.src = 'https://raw.github.com/marijnh/CodeMirror/master/keymap/emacs.js';
-        document.head.appendChild(emacsbindings);
+        for (var i=0, len=scripts.length; i<len; i++) {
+            insert_script(scripts[i].name, scripts[i].src);
+        }
 
         var cursor_style = ['.CodeMirror.cm-keymap-fat-cursor pre.CodeMirror-cursor {',
                            '    z-index: 10;',
@@ -130,6 +141,12 @@ function load_bindings () {
         new_css.type = 'text/css';
         new_css.innerHTML = cursor_style;
         document.head.appendChild(new_css);
+
+        var dialog_css = document.createElement('link');
+        dialog_css.rel = 'stylesheet';
+        dialog_css.type = 'text/css';
+        dialog_css.href = 'https://raw.github.com/marijnh/CodeMirror/master/addon/dialog/dialog.css';
+        document.head.appendChild(dialog_css);
 }
 
 function load_keymap_btn () {
