@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name Udacity Vim Bindings
-// @description Vim keybindings for the Udacity IDE.
+// @name Udacity Extended Keybindings
+// @description Vim and Emacs keybindings for the Udacity IDE.
 // @version 0.9
 // 
 // @namespace http://e.cmendenhall.com/
@@ -19,21 +19,25 @@ function inject(fn) {
 }
 
 function change_keymap () {
-    console.log('toggle_mode');
+
+    var ember_view_div = document.getElementById('assignment-view').firstElementChild;
+    var ember_view_id = ember_view_div.id;
+    var code_editor = Ember.View.views[ember_view_id].assignment.codeEditor;
+    var keymap_mode;
     
-    var keymap_mode = document.getElementById('keymap_btn').firstElementChild.innerText;
+    if (document.all) {
+        keymap_mode = document.getElementById('keymap_btn').firstElementChild.innerText;
+    } else {
+        keymap_mode = document.getElementById('keymap_btn').firstElementChild.textContent;
+    }
 
     if (keymap_mode === 'VIM') {
-        console.log(CodeMirror.keyMap.default);
-        console.log(CodeMirror.keyMap);
         
-        CodeMirror.keyMap.default = CodeMirror.keyMap.vim;
-        /*codemirror_textarea.addEventListener('keydown', function (key_event) {
-                console.log(key_event);
-                var cm_div = document.getElementsByClassName('CodeMirror')[0]; 
-
+        code_editor.setOption('keyMap', 'vim');
+        code_editor.setOption('onKeyEvent', function (instance, key_event) {
+                
                 function changeCursor(state) {
-                     
+                     var cm_div = document.getElementsByClassName('CodeMirror')[0];
                      var current_class = cm_div.className;
                      var focus = current_class.search('CodeMirror-focused');
                      var new_class;
@@ -48,43 +52,60 @@ function change_keymap () {
                      }
                      cm_div.className = new_class;
                  }
-                  
-                 if (key_event.keyIdentifier === 'U+001B') {
+                 
+                 // ESC 
+                 if (key_event.keyCode === 27) {
                      changeCursor('normal');
                  }
-                 else if (key_event.keyIdentifier === 'U+005B' && key_event.ctrlKey) {
+                 // C-[
+                 else if (key_event.keyCode === 219 && key_event.ctrlKey) {
                      changeCursor('normal');
                  }
-                 else if (key_event.keyIdentifier === 'U+0043' && key_event.ctrlKey) {
+
+                 // C-c
+                 else if (key_event.keyCode === 67 && key_event.ctrlKey) {
                      changeCursor('normal');  
                  }
-                 else if (key_event.keyIdentifier === 'U+0041') {
+
+                 // a
+                 else if (key_event.keyCode === 65) {
                      changeCursor('insert');
                  }
-                 else if (key_event.keyIdentifier === 'U+0049') {
+
+                 // i
+                 else if (key_event.keyCode === 73) {
                      changeCursor('insert');
                  }
-                 else if (key_event.keyIdentifier === 'U+0053') {
+
+                 // s
+                 else if (key_event.keyCode === 83) {
                      changeCursor('insert');
                  }
-                 else if (key_event.keyIdentifier === 'U+004F') {
+
+                 // o
+                 else if (key_event.keyCode === 79) {
                      changeCursor('insert');
                  }
-        });*/
+        });
     }
     
     else if (keymap_mode === 'DEFAULT') {
-        CodeMirror.keyMap.default = CodeMirror.keyMap._default;
-        //cm_div.addEventListener('keydown', function () {});
+        code_editor.setOption('keyMap', 'default');
+        
     }
 
     else if (keymap_mode === 'EMACS') {
-        CodeMirror.keyMap.default = CodeMirror.keyMap.emacs;
+        code_editor.setOption('keyMap', 'emacs');
+        code_editor.setOption('onKeyEvent', function () {});
     }
 }
 
 function load_bindings () {
-        console.log('load_bindings');
+
+        codemirror_js = document.createElement('script');
+        codemirror_js.type = 'text/javascript';
+        codemirror_js.type.src = 'https://raw.github.com/marijnh/CodeMirror/master/lib/codemirror.js';
+        document.head.appendChild(codemirror_js);
 
         vimbindings = document.createElement('script');
         vimbindings.type = 'text/javascript';
@@ -109,19 +130,59 @@ function load_bindings () {
         new_css.type = 'text/css';
         new_css.innerHTML = cursor_style;
         document.head.appendChild(new_css);
-
-        CodeMirror.keyMap._default = CodeMirror.keyMap.default;
 }
 
 function load_keymap_btn () {
+
+    function toggle_mode (btn) {
+        var binding_titles = ["DEFAULT", "VIM", "EMACS"];
+        var btn_state = btn.getAttribute('state');
+        var i = parseInt(btn_state, 10);
+        i = (i + 1) % binding_titles.length;
+        btn.setAttribute("state", i);
+        var keymap_mode = binding_titles[i];
+        if (document.all) {
+            btn.firstElementChild.innerText = keymap_mode;
+        } else {
+            btn.firstElementChild.textContent = keymap_mode;
+        }
+        return keymap_mode;
+    }
+
+    function reset_mode (btn) {
+        btn.setAttribute("state", 0);
+        if (document.all) {
+            btn.firstElementChild.innerText = "DEFAULT";
+        } else {
+            btn.firstElementChild.textContent = "DEFAULT";
+        }
+    }
+
+    function try_append () {
+        var auto_next_view = right_column.childNodes[2];
+        if (auto_next_view) {
+          right_column.appendChild(keymap_btn); 
+        } else {
+            setTimeout(try_append, 500);
+        }
+    }
+
     var right_column = document.getElementById('player-right-column');
 
     var keymap_btn = document.createElement('div');
     keymap_btn.setAttribute("class", "button gray-button");
     keymap_btn.setAttribute("id", "keymap_btn");
-    keymap_btn.innerText = " Key bindings: ";
+    if (document.all) {
+        keymap_btn.innerText = " Key bindings: ";
+    } else {
+        keymap_btn.textContent = " Key bindings: ";
+    }
     var strong_state = document.createElement('strong');
-    strong_state.innerText = "DEFAULT";
+    if (document.all) {
+        strong_state.innerText = "DEFAULT";
+    } else {
+        strong_state.textContent = "DEFAULT";
+    }
     keymap_btn.appendChild(strong_state);
 
     var keymap_btn_style = ['#keymap_btn {',
@@ -140,24 +201,7 @@ function load_keymap_btn () {
 
     keymap_btn.setAttribute("state", 0);
 
-    function toggle_mode (btn) {
-        var binding_titles = ["DEFAULT", "VIM", "EMACS"];
-        var btn_state = btn.getAttribute('state');
-        var i = parseInt(btn_state);
-        i = (i + 1) % binding_titles.length;
-        btn.setAttribute("state", i);
-        var keymap_mode = binding_titles[i];
-        btn.firstElementChild.innerText = keymap_mode;
-        return keymap_mode;
-    }
-
-    function reset_mode (btn) {
-        btn.setAttribute("state", 0);
-        btn.firstElementChild.innerText = "DEFAULT";
-    }
-
     keymap_btn.addEventListener('click', function () {
-        console.log('click')
         var keymap_mode = toggle_mode(this);
         inject(change_keymap);
     });
@@ -167,16 +211,6 @@ function load_keymap_btn () {
     });
 
     inject(load_bindings);
-
-    function try_append () {
-        var auto_next_view = right_column.childNodes[2];
-        if (auto_next_view) {
-          right_column.appendChild(keymap_btn); 
-        } else {
-            setTimeout(try_append, 500);
-        }
-    }
-
     try_append();
 
 }
