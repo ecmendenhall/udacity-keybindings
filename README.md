@@ -1,6 +1,6 @@
 ## About
 This userscript enables Vim and Emacs keybindings for Udacity's embedded 
-[CodeMirror](http://codemirror.net/)  IDE. No longer will your code be littered
+[CodeMirror](http://codemirror.net/) editor. No longer will your code be littered
 with stray `i`s and `dd`s!
 
 ## Installation
