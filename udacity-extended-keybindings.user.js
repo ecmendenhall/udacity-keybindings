@@ -5,7 +5,7 @@
 // 
 // @namespace http://e.cmendenhall.com/
 //
-// @downloadURL https://ecmendenhall.github.com/udacity-keybindings/udacity-extended-keybindings.user.js
+// @downloadURL http://ecmendenhall.github.com/udacity-keybindings/udacity-extended-keybindings.user.js
 // 
 // @include http://www.udacity.com/view*
 // @match http://www.udacity.com/view*
