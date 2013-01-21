@@ -5,7 +5,7 @@
 // 
 // @namespace http://e.cmendenhall.com/
 //
-// @downloadURL https://github.com/ecmendenhall/udacity-keybindings/raw/master/udacity-extended-keybindings.user.js
+// @downloadURL https://ecmendenhall.github.com/udacity-keybindings/udacity-extended-keybindings.user.js
 // 
 // @include http://www.udacity.com/view*
 // @match http://www.udacity.com/view*
@@ -121,9 +121,9 @@ function load_bindings () {
         }
 
         var scripts = [{name: 'vimbindings',
-                        src:'https://raw.github.com/marijnh/CodeMirror/master/keymap/vim.js'},
+                        src:'http://ecmendenhall.github.com/udacity-keybindings/vim.js'},
                        {name: 'emacsbindings',
-                        src: 'https://raw.github.com/marijnh/CodeMirror/master/keymap/emacs.js'}];
+                        src: 'http://ecmendenhall.github.com/udacity-keybindings/emacs.js'}];
 
         for (var i=0, len=scripts.length; i<len; i++) {
             insert_script(scripts[i].name, scripts[i].src);
@@ -141,12 +141,6 @@ function load_bindings () {
         new_css.type = 'text/css';
         new_css.innerHTML = cursor_style;
         document.head.appendChild(new_css);
-
-        var dialog_css = document.createElement('link');
-        dialog_css.rel = 'stylesheet';
-        dialog_css.type = 'text/css';
-        dialog_css.href = 'https://raw.github.com/marijnh/CodeMirror/master/addon/dialog/dialog.css';
-        document.head.appendChild(dialog_css);
 }
 
 function load_keymap_btn () {
