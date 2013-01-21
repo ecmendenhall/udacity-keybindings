@@ -4,10 +4,10 @@ This userscript enables Vim and Emacs keybindings for Udacity's embedded
 with stray `i`s and `dd`s!
 
 ## Installation
-Firefox: [click here](https://github.com/ecmendenhall/udacity-keybindings/raw/master/udacity-extended-keybindings.user.js)
+Firefox: [click here](http://ecmendenhall.github.com/udacity-keybindings/udacity-extended-keybindings.user.js)
 to install.
 
-Chrome: [click here](https://github.com/ecmendenhall/udacity-keybindings/raw/master/udacity-extended-keybindings.user.js)
+Chrome: [click here](http://ecmendenhall.github.com/udacity-keybindings/udacity-extended-keybindings.user.js)
 to download the script. Open your extension settings (chrome://extensions/). Drag the
 file over the window and drop to install.
 
