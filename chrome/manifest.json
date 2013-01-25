@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+  "name": "Udacity Extended Keybindings",
+  "version": "0.9.2",
+  "content_scripts": [
+    {
+      "matches": ["http://www.udacity.com/course/viewer*",
+                  "https://www.udacity.com/course/viewer*"],
+      "js": ["inject_keybindings.js"]
+    }
+  ],
+  "description": "Vim and Emacs keybindings for Udacity's embedded code editor.",
+  "web_accessible_resources": ["vim.js", "emacs.js", "keybindings.js"]
+}
+
