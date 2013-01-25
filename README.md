@@ -7,9 +7,9 @@ with stray `i`s and `dd`s!
 Firefox: [click here](http://ecmendenhall.github.com/udacity-keybindings/udacity-extended-keybindings.user.js)
 to install.
 
-Chrome: [click here](http://ecmendenhall.github.com/udacity-keybindings/chrome.crx) to download the script,
-packaged as a Chrome extension. Open your extension settings (chrome://extensions/). Drag the `.crx` file
-over the window and drop to install.
+Chrome: [click here](http://ecmendenhall.github.com/udacity-keybindings/udacity-extended-keybindings.crx) 
+to download the script, packaged as a Chrome extension. Open your extension settings 
+(chrome://extensions/). Drag the `.crx` file over the window and drop to install.
 
 This script is also available on [userscripts.org](http://userscripts.org/scripts/show/156966).
 
