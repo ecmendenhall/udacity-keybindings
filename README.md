@@ -7,15 +7,15 @@ with stray `i`s and `dd`s!
 Firefox: [click here](http://ecmendenhall.github.com/udacity-keybindings/udacity-extended-keybindings.user.js)
 to install.
 
-Chrome: [click here](http://ecmendenhall.github.com/udacity-keybindings/udacity-extended-keybindings.user.js)
-to download the script. Open your extension settings (chrome://extensions/). Drag the
-file over the window and drop to install.
+Chrome: [click here](http://ecmendenhall.github.com/udacity-keybindings/chrome.crx) to download the script,
+packaged as a Chrome extension. Open your extension settings (chrome://extensions/). Drag the `.crx` file
+over the window and drop to install.
 
 This script is also available on [userscripts.org](http://userscripts.org/scripts/show/156966).
 
 ## Using Extended Keybindings
-Once the script is installed, you'll see a 'Keybindings' button underneath the
-auto-next button on the right side of the screen. Click to rotate through keyboard
+Once the script is installed, you'll see a 'Keybindings' button next to the "Reset" and "Test Run"
+buttons underneath the embedded code editor. Click to rotate through the included keyboard
 configurations: default, Vim, and Emacs. When Vim normal mode is enabled, you'll see
 a fat blue cursor. Most of your favorite Vim commands will now work. (Try `ci(` or `5dd`!)
 To get a feel for what's available without messing up your own code, check out the 
