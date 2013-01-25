@@ -1,14 +1,15 @@
 // ==UserScript==
 // @name Udacity Extended Keybindings
 // @description Vim and Emacs keybindings for the Udacity IDE.
-// @version 0.9.1
+// @version 0.9.2
 // 
 // @namespace http://e.cmendenhall.com/
 //
 // @downloadURL http://ecmendenhall.github.com/udacity-keybindings/udacity-extended-keybindings.user.js
 // 
-// @include http://www.udacity.com/view*
-// @match http://www.udacity.com/view*
+// @include https://www.udacity.com/course/viewer*
+// @match https://www.udacity.com/course/viewer*
+//
 // 
 // ==/UserScript==
 
@@ -22,9 +23,8 @@ function inject(fn) {
 
 function change_keymap () {
 
-    var ember_view_div = document.getElementById('assignment-view').firstElementChild;
-    var ember_view_id = ember_view_div.id;
-    var code_editor = Ember.View.views[ember_view_id].assignment.codeEditor;
+    var codemirror = document.getElementsByClassName('CodeMirror')[0];
+    var code_editor = codemirror.CodeMirror;
     var keymap_mode;
     
     if (document.all) {
@@ -170,18 +170,18 @@ function load_keymap_btn () {
     }
 
     function try_append () {
-        var auto_next_view = right_column.childNodes[2];
-        if (auto_next_view) {
-          right_column.appendChild(keymap_btn); 
+        var test_run = document.getElementsByClassName('test-run')[0];
+        if (test_run) {
+          quiz_controls.appendChild(keymap_btn); 
         } else {
             setTimeout(try_append, 500);
         }
     }
 
-    var right_column = document.getElementById('player-right-column');
+    var quiz_controls = document.getElementsByClassName('programming-quiz-controls')[0];
 
     var keymap_btn = document.createElement('div');
-    keymap_btn.setAttribute("class", "button gray-button");
+    keymap_btn.setAttribute("class", "btn");
     keymap_btn.setAttribute("id", "keymap_btn");
     if (document.all) {
         keymap_btn.innerText = " Key bindings: ";
@@ -197,12 +197,8 @@ function load_keymap_btn () {
     keymap_btn.appendChild(strong_state);
 
     var keymap_btn_style = ['#keymap_btn {',
-                             '  float: right;',
-                             '  clear: both;',
-                             '  margin-top: 5px;', 
-                             '  margin-bottom: 3px;',
+                             '  margin-right: 10px;',
                              '  line-height: 18px;',
-                             '  width: 150px;',
                              '}'].join('\n');
 
     var keymap_btn_css = document.createElement('style');
