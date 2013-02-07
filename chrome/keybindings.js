@@ -35,10 +35,10 @@ function change_keymap () {
                      var focus = current_class.search('CodeMirror-focused');
                      var new_class;
                      if (state === 'normal') {
-                         new_class = 'CodeMirror cm-keymap-fat-cursor'; 
+                         new_class = 'CodeMirror cm-s-codacity cm-keymap-fat-cursor'; 
                      }
                      else if (state === 'insert') {
-                         new_class = 'CodeMirror';
+                         new_class = 'CodeMirror cm-s-codacity';
                      }
                      if (focus) {
                          new_class = new_class + ' CodeMirror-focused';
