@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Udacity Extended Keybindings
 // @description Vim and Emacs keybindings for the Udacity IDE.
-// @version 0.9.2
+// @version 0.9.3
 // 
 // @namespace http://e.cmendenhall.com/
 //
