@@ -140,13 +140,12 @@ function load_keymap_btn () {
     function try_append () {
         var test_run = document.getElementsByClassName('test-run')[0];
         if (test_run) {
+          var quiz_controls = document.getElementsByClassName('viewer-button-bar')[0];
           quiz_controls.appendChild(keymap_btn); 
         } else {
             setTimeout(try_append, 500);
         }
     }
-
-    var quiz_controls = document.getElementsByClassName('programming-quiz-controls')[0];
 
     var keymap_btn = document.createElement('div');
     keymap_btn.setAttribute("class", "btn");
